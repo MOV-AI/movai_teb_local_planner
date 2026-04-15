@@ -189,6 +189,7 @@ void TebLocalPlannerROS::initialize(std::string name, tf2_ros::Buffer* tf, costm
     
     // set initialized flag
     initialized_ = true;
+    velocity_history.clear();
 
     ROS_DEBUG("teb_local_planner plugin initialized.");
   }
@@ -452,6 +453,24 @@ uint32_t TebLocalPlannerROS::computeVelocityCommands(const geometry_msgs::PoseSt
   
   // store last command (for recovery analysis etc.)
   last_cmd_ = cmd_vel.twist;
+  velocity_history.push_back(last_cmd_.linear.x);
+  if (velocity_history.size() > 100) { // keep history of the last 100 velocity commands
+    velocity_history.erase(velocity_history.begin()); // remove the oldest command
+    // check if there are at least 2 zero crossings in the history, which might indicate oscillations
+    int zero_crossings = 0;
+    for (size_t i = 1; i < velocity_history.size(); ++i) {
+      if ((velocity_history[i-1] >= 0 && velocity_history[i] < 0) || (velocity_history[i-1] <= 0 && velocity_history[i] > 0)) {
+        zero_crossings++;
+      }
+      if (zero_crossings >= 6) {
+        ROS_FATAL("Back and forth detected!");
+        break;
+      }
+    }
+    velocity_history.clear(); // clear history after detection to avoid repeated warnings
+  }
+
+
   
   // Now visualize everything    
   planner_->visualize();

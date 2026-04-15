@@ -389,8 +389,6 @@ protected:
   
   
   void configureBackupModes(std::vector<geometry_msgs::PoseStamped>& transformed_plan,  int& goal_idx);
-
-
   
 private:
   // Definition of member variables
@@ -445,6 +443,7 @@ private:
     
   // flags
   bool initialized_; //!< Keeps track about the correct initialization of this class
+  std::vector<double> velocity_history; // Store the history of the translational velocity for back-and-forth detection
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
