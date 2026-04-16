@@ -47,6 +47,9 @@
 #include <base_local_planner/goal_functions.h>
 #include <base_local_planner/odometry_helper_ros.h>
 #include <base_local_planner/costmap_model.h>
+#include <std_mssgs/Float32.h>
+#include <std_msgs/Int32.h>
+#include <std_msgs/Bool.h>
 
 
 // timed-elastic-band related classes
