@@ -318,8 +318,8 @@ uint32_t TebLocalPlannerROS::computeVelocityCommands(const geometry_msgs::PoseSt
     && (base_local_planner::stopped(base_odom, cfg_.goal_tolerance.theta_stopped_vel, cfg_.goal_tolerance.trans_stopped_vel)
         || cfg_.goal_tolerance.free_goal_vel))
   {
-    ROS_ERROR("robot position {}, {}", robot_pose_.x(), robot_pose_.y());
-    ROS_ERROR("goal position {}, {}", global_goal.pose.position.x, global_goal.pose.position.y);
+    ROS_ERROR("robot position %f, %f", robot_pose_.x(), robot_pose_.y());
+    ROS_ERROR("goal position %f, %f", global_goal.pose.position.x, global_goal.pose.position.y);
     goal_reached_ = true;
     return mbf_msgs::ExePathResult::SUCCESS;
   }
