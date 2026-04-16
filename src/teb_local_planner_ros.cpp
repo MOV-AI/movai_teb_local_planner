@@ -98,6 +98,11 @@ void TebLocalPlannerROS::initialize(std::string name, tf2_ros::Buffer* tf, costm
     name_ = name;
     // create Node Handle with name of plugin (as used in move_base for loading)
     ros::NodeHandle nh("~/" + name);
+
+    xy_eucli_pub = nh.advertise<std_msgs::Float32>("/xy_eucli", 1000);
+    yaw_eucli_pub = nh.advertise<std_msgs::Float32>("/yaw_eucli", 1000);
+    n_viapoints_left_pub = nh.advertise<std_msgs::Int32>("/n_viapoints_left", 1000);
+    stopped_pub = nh.advertise<std_msgs::Bool>("/stopped", 1000);
 	        
     // get parameters of TebConfig via the nodehandle and override the default config
     cfg_.loadRosParamFromNodeHandle(nh);       
@@ -294,10 +299,12 @@ uint32_t TebLocalPlannerROS::computeVelocityCommands(const geometry_msgs::PoseSt
   double dx = global_goal.pose.position.x - robot_pose_.x();
   double dy = global_goal.pose.position.y - robot_pose_.y();
   double delta_orient = g2o::normalize_theta( tf2::getYaw(global_goal.pose.orientation) - robot_pose_.theta() );
-  ROS_ERROR_THROTTLE(1.0, "Goal reached check: dx=%f, dy=%f, delta_orient=%f", dx, dy, delta_orient);
-  ROS_ERROR_THROTTLE(1.0, "Goal reached check: xy_goal_tolerance=%f, yaw_goal_tolerance=%f, complete_global_plan=%d, via_points.size()=%zu, stopped=%d, free_goal_vel=%d",
-                           cfg_.goal_tolerance.xy_goal_tolerance, cfg_.goal_tolerance.yaw_goal_tolerance, cfg_.goal_tolerance.complete_global_plan,
-                           via_points_.size(), base_local_planner::stopped(base_odom, cfg_.goal_tolerance.theta_stopped_vel, cfg_.goal_tolerance.trans_stopped_vel), cfg_.goal_tolerance.free_goal_vel);
+
+  xy_eucli_pub.publish(std_msgs::Float32{static_cast<float>(fabs(std::sqrt(dx*dx+dy*dy)))});
+  yaw_eucli_pub.publish(std_msgs::Float32{static_cast<float>(fabs(delta_orient))});
+  n_viapoints_left_pub.publish(std_msgs::Int32{static_cast<int>(via_points_.size())});
+  stopped_pub.publish(std_msgs::Bool{base_local_planner::stopped(base_odom, cfg_.goal_tolerance.theta_stopped_vel, cfg_.goal_tolerance.trans_stopped_vel)});
+  
   if(fabs(std::sqrt(dx*dx+dy*dy)) < cfg_.goal_tolerance.xy_goal_tolerance
     && fabs(delta_orient) < cfg_.goal_tolerance.yaw_goal_tolerance
     && (!cfg_.goal_tolerance.complete_global_plan || via_points_.size() == 0)

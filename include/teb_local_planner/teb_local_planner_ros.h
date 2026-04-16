@@ -445,6 +445,11 @@ private:
   bool initialized_; //!< Keeps track about the correct initialization of this class
   std::vector<double> velocity_history; // Store the history of the translational velocity for back-and-forth detection
 
+  ros::Publisher xy_eucli_pub;
+  ros::Publisher yaw_eucli_pub;
+  ros::Publisher n_viapoints_left_pub;  
+  ros::Publisher stopped_pub;
+
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
