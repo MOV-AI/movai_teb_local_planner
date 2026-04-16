@@ -448,6 +448,11 @@ private:
   bool initialized_; //!< Keeps track about the correct initialization of this class
   std::vector<double> velocity_history; // Store the history of the translational velocity for back-and-forth detection
 
+  std_msgs::Float32 xy_msg;
+  std_msgs::Float32 yaw_msg;
+  std_msgs::Int32 n_viapoints_left_msg;
+  std_msgs::Bool stopped_msg;
+
   ros::Publisher xy_eucli_pub;
   ros::Publisher yaw_eucli_pub;
   ros::Publisher n_viapoints_left_pub;  

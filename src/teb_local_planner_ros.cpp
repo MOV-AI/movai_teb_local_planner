@@ -299,11 +299,18 @@ uint32_t TebLocalPlannerROS::computeVelocityCommands(const geometry_msgs::PoseSt
   double dx = global_goal.pose.position.x - robot_pose_.x();
   double dy = global_goal.pose.position.y - robot_pose_.y();
   double delta_orient = g2o::normalize_theta( tf2::getYaw(global_goal.pose.orientation) - robot_pose_.theta() );
-
-  xy_eucli_pub.publish(static_cast<float>(fabs(std::sqrt(dx*dx+dy*dy))));
-  yaw_eucli_pub.publish(static_cast<float>(fabs(delta_orient)));
-  n_viapoints_left_pub.publish(static_cast<int>(via_points_.size()));
-  stopped_pub.publish(base_local_planner::stopped(base_odom, cfg_.goal_tolerance.theta_stopped_vel, cfg_.goal_tolerance.trans_stopped_vel));
+  
+  xy_msg.data = static_cast<float>(fabs(std::sqrt(dx*dx+dy*dy)));
+  xy_eucli_pub.publish(xy_msg);
+  
+  yaw_msg.data = static_cast<float>(fabs(delta_orient));
+  yaw_eucli_pub.publish(yaw_msg);
+  
+  n_viapoints_left_msg.data = static_cast<int>(via_points_.size());
+  n_viapoints_left_pub.publish(n_viapoints_left_msg);
+  
+  stopped_msg.data = base_local_planner::stopped(base_odom, cfg_.goal_tolerance.theta_stopped_vel, cfg_.goal_tolerance.trans_stopped_vel);
+  stopped_pub.publish(stopped_msg);
 
   if(fabs(std::sqrt(dx*dx+dy*dy)) < cfg_.goal_tolerance.xy_goal_tolerance
     && fabs(delta_orient) < cfg_.goal_tolerance.yaw_goal_tolerance
