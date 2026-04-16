@@ -462,7 +462,7 @@ uint32_t TebLocalPlannerROS::computeVelocityCommands(const geometry_msgs::PoseSt
       if ((velocity_history[i-1] >= 0 && velocity_history[i] < 0) || (velocity_history[i-1] <= 0 && velocity_history[i] > 0)) {
         zero_crossings++;
       }
-      if (zero_crossings >= 6) {
+      if (zero_crossings >= 4) {
         ROS_FATAL("Back and forth detected!");
         break;
       }
