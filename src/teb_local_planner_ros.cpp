@@ -599,8 +599,8 @@ void TebLocalPlannerROS::updateObstacleContainerWithCustomObstacles()
     Eigen::Affine3d obstacle_to_map_eig;
     try 
     {
-      geometry_msgs::TransformStamped obstacle_to_map =  tf_->lookupTransform(global_frame_, ros::Time(0),
-                                                                              custom_obstacle_msg_.header.frame_id, ros::Time(0),
+      geometry_msgs::TransformStamped obstacle_to_map =  tf_->lookupTransform(global_frame_, ros::Time::now(),
+                                                                              custom_obstacle_msg_.header.frame_id, ros::Time::now(),
                                                                               custom_obstacle_msg_.header.frame_id, ros::Duration(cfg_.robot.transform_tolerance));
       obstacle_to_map_eig = tf2::transformToEigen(obstacle_to_map);
     }
