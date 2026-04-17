@@ -273,7 +273,17 @@ uint32_t TebLocalPlannerROS::computeVelocityCommands(const geometry_msgs::PoseSt
   
   // prune global plan to cut off parts of the past (spatially before the robot)
   pruneGlobalPlan(*tf_, robot_pose, global_plan_, cfg_.trajectory.global_plan_prune_distance);
+  // Around line 275 in computeVelocityCommands, add position staleness check:
+  static geometry_msgs::PoseStamped last_robot_pose = robot_pose;
+  static ros::Time last_pose_update = ros::Time::now();
 
+  // Check if pose hasn't updated in a while
+  if ((ros::Time::now() - last_pose_update).toSec() > 0.5) {
+      ROS_WARN("Potential stale odometry detected!");
+      planner_->clearPlanner();  // Force replan
+  }
+  last_robot_pose = robot_pose;
+  last_pose_update = ros::Time::now();
   // Transform global plan to the frame of interest (w.r.t. the local costmap)
   std::vector<geometry_msgs::PoseStamped> transformed_plan;
   int goal_idx;
